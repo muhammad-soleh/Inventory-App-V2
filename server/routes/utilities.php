@@ -6,7 +6,7 @@ $utilitiesController = new UtilitiesController($pdo);
 
 switch ($resource) {
     case 'getStockProduk':
-        $utilitiesController->getAllProduk();
+        $utilitiesController->getStockProduk();
         break;
     case 'getProdukPenjualan':
         $utilitiesController->getProdukPenjualan();

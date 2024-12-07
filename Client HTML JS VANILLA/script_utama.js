@@ -30,3 +30,11 @@ function formatToDecimal(rupiahString) {
   // 4. Pastikan hasil desimal memiliki dua angka di belakang koma
   return decimalValue.toFixed(2);
 }
+
+document.getElementById("logout").addEventListener("click", (event) => {
+  event.preventDefault();
+  if (confirm("Yakin ingin logout?")) {
+    sessionStorage.removeItem("authToken");
+    window.location.href = "../login.html";
+  }
+});

@@ -5,12 +5,18 @@ function searchProduk() {
   const query = document.getElementById("produk").value.toLowerCase();
   const suggestions = document.getElementById("suggestions");
   suggestions.innerHTML = "";
+  const token = sessionStorage.getItem("authToken");
 
   if (query.length > 1) {
-    fetch("http://localhost:8000/produk/getStockProduk")
+    fetch("http://localhost:8000/produk/getStockProduk", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
-        produkList = data.filter((item) =>
+        document.getElementById("id_user").value = data.user.id_user;
+        produkList = data.data.filter((item) =>
           item.nama_produk.toLowerCase().includes(query)
         );
         produkList.forEach((item) => {
@@ -57,6 +63,7 @@ document
     const jumlah = document.getElementById("jumlah").value;
     const hargaTotal = document.getElementById("harga_total").value;
     const id_produk = document.getElementById("id_produk").value;
+    const id_user = document.getElementById("id_user").value;
 
     if (!produk || !hargaSatuan || jumlah <= 0) {
       alert("Harap isi semua data dengan benar.");
@@ -65,12 +72,17 @@ document
 
     const dataPenjualan = {
       id_produk,
+      id_user,
       jumlah,
       harga_satuan: parseFloat(hargaSatuan),
       total_harga: parseFloat(formatToDecimal(hargaTotal)),
     };
+    const token = sessionStorage.getItem("authToken");
     fetch("http://localhost:8000/penjualan/", {
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(dataPenjualan),
     })
       .then((response) => {

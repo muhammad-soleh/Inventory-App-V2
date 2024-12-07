@@ -9,5 +9,5 @@ $password = "";
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db_name", $username, $password);
 } catch (PDOException $e) {
-    die(json_encode(["Message" => "Databse connection failed " . $e->getMessage()]));
+    die(json_encode(['status' => 'error', "message" => "Databse connection failed " . $e->getMessage()]));
 }

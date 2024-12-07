@@ -9,6 +9,13 @@
       rel="stylesheet"
     />
   </head>
+  <script>
+    // Pengecekan SessionStorage sebelum halaman selesai dimuat
+    if (!sessionStorage.getItem("authToken")) {
+      alert("Kamu belom login, silahkan login terlebih dahulu...");
+      window.location.href = "../login.html"; // Redirect ke halaman login
+    }
+  </script>
   <body>
     <div class="container mt-4">
       <h1>Tambah Pembelian</h1>
@@ -45,6 +52,9 @@
         <div class="mb-3">
           <label for="harga_total" class="form-label">Harga Total</label>
           <input type="text" class="form-control" id="harga_total" readonly />
+        </div>
+        <div class="mb-3">
+          <input type="hidden" class="form-control" id="id_user" readonly />
         </div>
         <button type="submit" class="btn btn-primary">Simpan</button>
       </form>

@@ -31,6 +31,15 @@ switch ($resource) {
     case 'penjualan':
         include 'routes/penjualan.php';
         break;
+    case 'user':
+        include 'routes/user.php';
+        break;
+    case 'login':
+        include 'routes/login.php';
+        break;
+    case 'history':
+        include 'routes/history.php';
+        break;
     default:
         echo json_encode(["message" => "Resource Not Found"]);
 }

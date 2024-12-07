@@ -1,12 +1,21 @@
 document.addEventListener("DOMContentLoaded", function () {
+  const token = sessionStorage.getItem("authToken");
   // Fetch data from API
-  fetch("http://localhost:8000/produk/getStockProduk")
+  fetch("http://localhost:8000/produk/getStockProduk", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
     .then((response) => response.json()) // Convert response to JSON
     .then((data) => {
       // Populate table body
       const tableBody = document.querySelector("#produk tbody");
-      console.log(data);
-      data.forEach((item, index) => {
+      if (data.status == "error") {
+        const row = `<tr><td colspan="7" class="text-center">Gagal Query</td></tr>`;
+        tableBody.insertAdjacentHTML("beforeend", row);
+        return;
+      }
+      data.data.forEach((item, index) => {
         const row = `
                       <tr>
                           <td>${index + 1}</td>
@@ -15,11 +24,24 @@ document.addEventListener("DOMContentLoaded", function () {
                           <td>${item.kategori}</td>
                           <td>Rp. ${formatRupiah(item.harga)}</td>
                           <td>${item.stok_terkini}</td>
+                          <td> <div class="btn-group" role="group">
+                          
+        <button type="button" class="btn btn-sm btn-warning" onclick=edit(${
+          item.id_produk
+        })><i class="bi bi-pencil-square"></i> Edit</button>
+        <button type="button" class="btn btn-sm btn-danger" onclick=deleteProduk(${
+          item.id_produk
+        })><i class="bi bi-trash"></i> Delete</button>
+      </div></td>
                       </tr>
                   `;
         tableBody.insertAdjacentHTML("beforeend", row);
       });
-
+      if (data.user.role != "admin") {
+        document.getElementById("admin").classList.add("invisible");
+      }
+      document.getElementById("welcome_user").innerHTML =
+        "Welcome, " + data.user.username;
       // Initialize DataTables
       $("#produk").DataTable();
     })
@@ -70,4 +92,41 @@ function submitForm() {
       console.error("Error:", error);
       errorMessage.textContent = error.message || "Gagal menghubungi server!";
     });
+}
+
+// Edit Data
+function edit(id) {
+  fetch("http://localhost:8000/produk?id=" + id, {
+    method: "GET",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.status == "error") {
+        alert("Tidak dapat mengedit data");
+        return;
+      }
+      if (localStorage.getItem("produkData")) {
+        localStorage.removeItem("produkData");
+      }
+      localStorage.setItem("produkData", JSON.stringify(data.data[0]));
+      window.location.href = "edit_produk.html";
+    });
+}
+
+function deleteProduk(id) {
+  if (confirm("Yakin ingin menghapus Data?")) {
+    fetch("http://localhost:8000/produk?id=" + id, {
+      method: "DELETE",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status == "error") {
+          alert("Tidak dapat Menghapus data");
+          return;
+        }
+        alert("data berhasil dihapus");
+
+        window.location.href = "produk.html";
+      });
+  }
 }

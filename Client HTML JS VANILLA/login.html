@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Page</title>
+    <!-- Link ke Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-light">
+    <div
+      class="container vh-100 d-flex justify-content-center align-items-center"
+    >
+      <div class="card shadow" style="width: 24rem">
+        <div class="card-body">
+          <h5 class="card-title text-center mb-4">Login</h5>
+          <div id="error-message" class="text-danger mb-3"></div>
+          <form id="loginForm">
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                placeholder="Enter your username"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-primary w-100" id="login">
+              Login
+            </button>
+          </form>
+          <p class="text-center mt-3 text-primary">
+            Jika lupa password hubungi admin
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Link ke Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault(); // Mencegah halaman refresh
+
+          const username = document.getElementById("username").value.trim();
+          const password = document.getElementById("password").value.trim();
+          const errorMessage = document.getElementById("error-message");
+
+          // Clear previous error message
+          errorMessage.textContent = "";
+
+          const loginButton = document.getElementById("login");
+          loginButton.innerText = "Loading...";
+          loginButton.disabled = true;
+
+          // Validasi form
+          if (!username || !password) {
+            errorMessage.textContent = "Username dan password wajib diisi!";
+            return;
+          }
+
+          const data = { username, password };
+
+          fetch("http://localhost:8000/login/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+              return response.json(); // Hanya parsing jika response valid
+            })
+            .then((data) => {
+              if (data.status == "error") {
+                alert(data.message);
+                loginButton.innerText = "Login";
+                loginButton.disabled = false;
+                return;
+              }
+              alert("Login Berhasil!!");
+
+              sessionStorage.setItem("authToken", data.token);
+              window.location.href = "./index.html";
+            })
+            .catch((error) => console.error("Fetch Error:", error.message));
+        });
+    </script>
+  </body>
+</html>
